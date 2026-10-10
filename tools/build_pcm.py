@@ -159,7 +159,7 @@ def main(argv: list[str] | None = None) -> int:
     repo_meta.write_text(json.dumps(package, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {archive}\nwrote {repo_meta}")
     if args.repo_dir:
-        write_repository(args.repo_dir, package, args.repo_url, metadata["author"]["name"])
+        write_repository(args.repo_dir, package, args.repo_url, metadata["resources"]["homepage"].split("/")[3])
         print(f"wrote repository files in {args.repo_dir}")
     return 0
 
