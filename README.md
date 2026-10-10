@@ -60,7 +60,9 @@ then pick that repository in the dropdown, select **JLC Footprint Importer**, *I
    KiCad requires the `identifier` in `plugin.json` to be reverse-DNS style with at least three
    parts (e.g. `com.github.<your-user>.jlc-footprint-importer`); change `drdpj` to your own
    GitHub username if you fork this.
-2. If your KiCad has a setting to enable the API/plugins (Preferences → Plugins), make sure it is on.
+2. KiCad 9 had an "Enable KiCad API" option under Preferences → Plugins. The KiCad 10 developer docs
+   don't mention one, and I haven't checked whether 10.0.6 still has it. If the toolbar button never
+   appears, look in Preferences → Plugins for such an option and turn it on.
 3. Restart KiCad and open the PCB editor. KiCad creates a Python virtual environment for the plugin
    and installs `requirements.txt` (pinned `kicad-python` and `easyeda2kicad`). This takes a while
    and needs internet access; the toolbar button only appears once it has finished. If it never
