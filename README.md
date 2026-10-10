@@ -42,7 +42,7 @@ It uses KiCad's IPC API plugin system (not the removed SWIG `pcbnew` Action Plug
 
    Only `plugin.json`, `requirements.txt`, `main.py`, `icons/` and `jlc_footprint_importer/` are needed.
    KiCad requires the `identifier` in `plugin.json` to be reverse-DNS style with at least three
-   parts (e.g. `com.github.<your-user>.jlc-footprint-importer`); change `danielj` to your own
+   parts (e.g. `com.github.<your-user>.jlc-footprint-importer`); change `drdpj` to your own
    GitHub username if you fork this.
 2. If your KiCad has a setting to enable the API/plugins (Preferences → Plugins), make sure it is on.
 3. Restart KiCad and open the PCB editor. KiCad creates a Python virtual environment for the plugin

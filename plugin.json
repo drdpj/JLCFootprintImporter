@@ -1,6 +1,6 @@
 {
   "$schema": "https://go.kicad.org/api/schemas/v1",
-  "identifier": "com.github.danielj.jlc-footprint-importer",
+  "identifier": "com.github.drdpj.jlc-footprint-importer",
   "name": "JLC Footprint Importer",
   "description": "Import an LCSC/JLCPCB part (symbol, footprint, 3D model) into a project-local KiCad library using easyeda2kicad.",
   "runtime": {
