@@ -35,6 +35,14 @@ class FailureKind(enum.Enum):
     FAILED = "failed"
 
 
+class Parts(enum.Enum):
+    """Which easyeda2kicad outputs to produce (its --full / --symbol / --footprint flags)."""
+
+    FULL = "--full"
+    SYMBOL = "--symbol"
+    FOOTPRINT = "--footprint"
+
+
 @dataclass(frozen=True)
 class BackendResult:
     ok: bool
@@ -44,13 +52,15 @@ class BackendResult:
 
 class EasyedaBackend(Protocol):
     def run(
-        self, lcsc_id: str, output_base: Path, custom_fields: list[str]
+        self, lcsc_id: str, output_base: Path, custom_fields: list[str], parts: Parts = Parts.FULL
     ) -> BackendResult: ...
 
 
-def build_argv(lcsc_id: str, output_base: Path, custom_fields: list[str]) -> list[str]:
+def build_argv(
+    lcsc_id: str, output_base: Path, custom_fields: list[str], parts: Parts = Parts.FULL
+) -> list[str]:
     """Equivalent of: easyeda2kicad --full --lcsc_id=<ID> --output <base> [--custom-field ...]."""
-    argv = ["--full", "--lcsc_id", lcsc_id, "--output", str(output_base)]
+    argv = [parts.value, "--lcsc_id", lcsc_id, "--output", str(output_base)]
     if custom_fields:
         argv += ["--custom-field", *custom_fields]  # nargs="+", so keep it last
     return argv
@@ -86,7 +96,7 @@ class LibraryBackend:
     """Runs easyeda2kicad in-process."""
 
     def run(
-        self, lcsc_id: str, output_base: Path, custom_fields: list[str]
+        self, lcsc_id: str, output_base: Path, custom_fields: list[str], parts: Parts = Parts.FULL
     ) -> BackendResult:
         try:
             from easyeda2kicad.__main__ import main as easyeda_main
@@ -100,7 +110,7 @@ class LibraryBackend:
         sink = io.StringIO()
         try:
             with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
-                code = easyeda_main(build_argv(lcsc_id, output_base, custom_fields))
+                code = easyeda_main(build_argv(lcsc_id, output_base, custom_fields, parts))
         except Exception as exc:  # easyeda2kicad can raise on malformed API data
             log.exception("easyeda2kicad raised")
             text = "\n".join(handler.lines + [f"[EXCEPTION] {exc!r}"])
@@ -119,11 +129,11 @@ class SubprocessBackend:
     """Fallback: run the `easyeda2kicad` CLI (or `python -m easyeda2kicad`) as a child process."""
 
     def run(
-        self, lcsc_id: str, output_base: Path, custom_fields: list[str]
+        self, lcsc_id: str, output_base: Path, custom_fields: list[str], parts: Parts = Parts.FULL
     ) -> BackendResult:
         cli = shutil.which("easyeda2kicad")
         base_cmd = [cli] if cli else [sys.executable, "-m", "easyeda2kicad"]
-        cmd = [*base_cmd, *build_argv(lcsc_id, output_base, custom_fields)]
+        cmd = [*base_cmd, *build_argv(lcsc_id, output_base, custom_fields, parts)]
         try:
             proc = subprocess.run(
                 cmd,

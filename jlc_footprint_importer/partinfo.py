@@ -38,6 +38,7 @@ class PartInfo:
     mpn: str = ""
     part_class: str = ""  # e.g. "Basic Part" / "Extended Part"
     footprint_name: str = ""  # name easyeda2kicad will give the footprint file
+    prefix: str = ""  # reference designator prefix from EasyEDA, e.g. "R?" -> "R"
 
     @property
     def description(self) -> str:
@@ -75,6 +76,7 @@ def parse_part_info(lcsc_id: str, result: dict[str, Any]) -> PartInfo:
         manufacturer=_clean_manufacturer(str(para.get("Manufacturer") or "")),
         mpn=str(para.get("Manufacturer Part") or result.get("title") or ""),
         part_class=str(para.get("JLCPCB Part Class") or ""),
+        prefix=str(para.get("pre") or "").rstrip("?").strip().upper(),
     )
 
 

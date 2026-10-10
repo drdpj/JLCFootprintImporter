@@ -8,7 +8,7 @@ import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .config import LCSC_PROPERTY_NAMES, LibraryPaths
+from .config import LCSC_PROPERTY_NAMES, LIB_NICKNAME, LibraryPaths
 from .sexpr import Node, SExprError, parse
 
 log = logging.getLogger(__name__)
@@ -19,10 +19,20 @@ class CachedPart:
     lcsc_id: str
     footprints: tuple[str, ...] = field(default_factory=tuple)
     symbols: tuple[str, ...] = field(default_factory=tuple)
+    symbol_footprint_refs: tuple[str, ...] = field(default_factory=tuple)  # "Footprint" field per symbol
 
     @property
     def complete(self) -> bool:
         return bool(self.footprints) and bool(self.symbols)
+
+    @property
+    def uses_stock_footprint(self) -> bool:
+        """Symbol-only import whose Footprint field points outside the jlc library."""
+        return (
+            bool(self.symbols)
+            and not self.footprints
+            and all(ref and not ref.startswith(f"{LIB_NICKNAME}:") for ref in self.symbol_footprint_refs)
+        )
 
     @property
     def found_any(self) -> bool:
@@ -42,6 +52,14 @@ def _has_lcsc_property(node: Node, lcsc_id: str) -> bool:
         if len(args) >= 2 and args[0].lower() in wanted and args[1].upper() == lcsc_id:
             return True
     return False
+
+
+def _property_value(node: Node, name: str) -> str:
+    for prop in node.find_all("property"):
+        args = prop.atom_args()
+        if len(args) >= 2 and args[0] == name:
+            return args[1]
+    return ""
 
 
 def _read(path: Path) -> str | None:
@@ -83,6 +101,7 @@ def find_cached_part(paths: LibraryPaths, lcsc_id: str) -> CachedPart:
     lcsc_id = lcsc_id.upper()
     footprints: list[str] = []
     symbols: list[str] = []
+    symbol_refs: list[str] = []
 
     if paths.footprint_dir.is_dir():
         for mod in sorted(paths.footprint_dir.glob("*.kicad_mod")):
@@ -102,5 +121,6 @@ def find_cached_part(paths: LibraryPaths, lcsc_id: str) -> CachedPart:
                     args = sym.atom_args()
                     if args and _has_lcsc_property(sym, lcsc_id):
                         symbols.append(args[0])
+                        symbol_refs.append(_property_value(sym, "Footprint"))
 
-    return CachedPart(lcsc_id, tuple(footprints), tuple(symbols))
+    return CachedPart(lcsc_id, tuple(footprints), tuple(symbols), tuple(symbol_refs))

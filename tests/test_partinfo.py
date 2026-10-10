@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from jlc_footprint_importer.config import LibraryPaths
+from jlc_footprint_importer.easyeda_backend import Parts
 from jlc_footprint_importer.importer import Status, import_part
 from jlc_footprint_importer.partinfo import PartInfo, parse_part_info
 from jlc_footprint_importer.provenance import (
@@ -96,7 +97,8 @@ def test_same_footprint_as_existing_part_is_not_imported(project) -> None:
     result = import_part(project, "C9999", backend=other, part_lookup=lambda _id: info)
     assert result.status is Status.DUPLICATE and result.ok
     assert "L0603" in result.message and "C1002" in result.message
-    assert other.calls == []
+    assert "identical pads" in result.message
+    assert other.parts == [Parts.FOOTPRINT]  # only fetched for comparison, nothing imported
     paths = LibraryPaths(project)
     assert "C9999" not in paths.symbol_file.read_text(encoding="utf-8")
 

@@ -127,6 +127,24 @@ def apply_part_info_to_symbol_library(text: str, lcsc_id: str, info: PartInfo) -
     return text
 
 
+def set_symbol_footprint(text: str, lcsc_id: str, footprint_id: str) -> str:
+    """Point the "Footprint" field of the symbol carrying ``lcsc_id`` at ``footprint_id``."""
+    root = parse(text)
+    for symbol in root.find_all("symbol"):
+        props = {
+            p.atom_args()[0]: p
+            for p in symbol.find_all("property")
+            if len(p.atom_args()) >= 2
+        }
+        lcsc = props.get("LCSC Part") or props.get("LCSC")
+        footprint = props.get("Footprint")
+        if lcsc is None or footprint is None or lcsc.atom_args()[1] != lcsc_id:
+            continue
+        value = footprint.children[2]
+        return text[: value.start] + quote(footprint_id) + text[value.end :]
+    return text
+
+
 def use_project_relative_model_path(text: str, model_dir: Path, model_uri: str) -> str:
     """Replace the absolute 3D model directory easyeda2kicad wrote with a ${KIPRJMOD} URI."""
     return text.replace(model_dir.as_posix(), model_uri)

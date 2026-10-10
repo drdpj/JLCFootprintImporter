@@ -55,7 +55,15 @@ It uses KiCad's IPC API plugin system (not the removed SWIG `pcbnew` Action Plug
 ## Usage
 
 Open a board, click **Import LCSC part**, enter the part number, press **Import**. Then add the
-symbol/footprint from the `jlc` library as usual. **The first import into a project creates the
+symbol/footprint from the `jlc` library as usual.
+
+If KiCad has a matching stock footprint (e.g. `Resistor_SMD:R_0603_1608Metric` for an 0603
+resistor), the dialog offers it first: **Use stock footprint** imports only the symbol, with its
+Footprint field set to the stock footprint (no EasyEDA footprint or 3D model); **Import JLC
+footprint anyway** does the full import. If the part is already in the library, nothing is
+downloaded.
+
+**The first import into a project creates the
 `jlc` library entries, and KiCad only reads a project's library tables when the project is opened,
 so close and reopen the project once before `jlc` shows up in the chooser.**
 
@@ -71,7 +79,8 @@ Tests mock easyeda2kicad; they never touch the network. The manifest can be chec
 
 Layout: `dialog.py` (wxPython UI), `importer.py` (orchestration), `libtables.py` + `sexpr.py` (table editing),
 `provenance.py`, `partinfo.py` (descriptions/metadata), `cache.py`, `easyeda_backend.py`,
-`kicad_context.py` (IPC API), `config.py` (paths/logging), `stock_check.py` (stub, see below).
+`kicad_context.py` (IPC API), `config.py` (paths/logging), `stock_check.py` (stock footprint lookup),
+`geometry.py` (pad comparison).
 
 ## Limitations / known gaps
 
@@ -87,12 +96,17 @@ Layout: `dialog.py` (wxPython UI), `importer.py` (orchestration), `libtables.py`
   reopened to see a newly created library.
 - KiCad's console may print wxWidgets debug lines such as `TreeView_SortChildrenCB() failed` or
   `SetFocus failed`; these come from KiCad's own UI and are harmless.
-- easyeda2kicad names footprints by package (e.g. `R0603`) and symbols by part number. A part whose
-  footprint name already exists in the library is **not imported** (reported as a duplicate, nothing
-  is overwritten) – so the existing footprint is reused. If the part details can't be fetched
-  (network), this pre-check is skipped and easyeda2kicad's own "already exists" error applies.
-- The footprint-name check compares names only, not geometry: two same-named but different
-  footprints (e.g. different 3D models or pad sizes) are treated as the same.
+- easyeda2kicad names footprints by package (e.g. `R0603`) and symbols by part number. If a part's
+  footprint name already exists in the library, the new footprint is fetched to a temp folder and
+  its **pads are compared** (number, type, shape, position, size, drill, layers; order and
+  equivalent 0°/180° rotations are ignored):
+  - identical pads → **not imported**, reported as a duplicate of the existing part;
+  - different pads → **not imported**, reported as a conflict listing the differences;
+  - comparison impossible (network) → treated as a duplicate with a "could not be compared" note.
+  Nothing is overwritten. If the part details can't be fetched at all, this pre-check is skipped
+  and easyeda2kicad's own "already exists" error applies.
+- The comparison covers **pads only**. A different 3D model, silkscreen or courtyard under the same
+  footprint name is not detected.
 - Footprints are emitted by easyeda2kicad in its own (older-style) format; KiCad reads and
   upgrades them. Quality of EasyEDA-derived footprints and 3D models varies – always check them
   (for example, the reference text can be large and overlap the pads).
@@ -100,8 +114,13 @@ Layout: `dialog.py` (wxPython UI), `importer.py` (orchestration), `libtables.py`
 - The part description is built from EasyEDA's data (category tag, value, package, manufacturer).
   It is only as good as that data.
 - The toolbar icons are simple generated placeholders.
-- Not implemented yet: the **stock footprint check** (offer e.g. `Resistor_SMD:R_0603_1608Metric`
-  instead of importing). The interface is in `jlc_footprint_importer/stock_check.py`.
+- The stock check only knows chip R/C/L/ferrite-bead/LED/diode packages (0201–2512, from the EasyEDA
+  package name and reference prefix). It looks for the footprint file in KiCad's installed
+  libraries; **TODO: unverified** whether KiCad exports `KICAD10_FOOTPRINT_DIR` to plugin processes
+  (default install paths are the fallback). Whether a stock footprint is *electrically* right
+  (e.g. a polarised or non-standard part) is your call – that's why you are asked.
+- The dialog buttons for the stock choice have been run only through the importer, not clicked in a
+  live KiCad.
 - Not packaged for the KiCad Plugin and Content Manager; install by copying the folder.
 
 ## Licensing – please read
