@@ -34,6 +34,15 @@ It uses KiCad's IPC API plugin system (not the removed SWIG `pcbnew` Action Plug
 
 ## Installation (KiCad 10.0.x)
 
+### Option A: Plugin and Content Manager (from a zip)
+
+Download `com.github.drdpj.jlc-footprint-importer-<version>.zip` from the
+[Releases](https://github.com/drdpj/JLCFootprintImporter/releases) page, then in KiCad open
+*Plugin and Content Manager → Install from File…* and pick the zip. (Not yet in KiCad's official
+repository; see *Packaging* below.)
+
+### Option B: manual copy
+
 1. Copy (or symlink) this folder to the KiCad user plugin directory **as its own subfolder**
    (`plugin.json` must not sit directly in `plugins\`):
    - Windows: `C:\Users\<you>\Documents\KiCad\10.0\plugins\jlc-footprint-importer\`
@@ -82,6 +91,14 @@ Layout: `dialog.py` (wxPython UI), `importer.py` (orchestration), `libtables.py`
 `kicad_context.py` (IPC API), `config.py` (paths/logging), `stock_check.py` (stock footprint lookup),
 `geometry.py` (pad comparison).
 
+## Packaging
+
+`python tools/build_pcm.py` builds `dist/<identifier>-<version>.zip` (reproducible; layout per the KiCad
+addon docs: `metadata.json`, `resources/icon.png`, `plugins/…`, with `"runtime": "ipc"`) and
+`dist/metadata-repository.json` (the same metadata plus `download_sha256/size/url`, which belong only in a
+repository submission). The version lives in `packaging/metadata.json`. Pushing a tag `vX.Y.Z` that matches
+it runs `.github/workflows/release.yml`: tests, build, validate, then a GitHub release with both files.
+
 ## Limitations / known gaps
 
 - **Tested on KiCad 10.0.6 / Windows only.** Verified in a running KiCad: the plugin loads, the
@@ -121,7 +138,11 @@ Layout: `dialog.py` (wxPython UI), `importer.py` (orchestration), `libtables.py`
   (e.g. a polarised or non-standard part) is your call – that's why you are asked.
 - The dialog buttons for the stock choice have been run only through the importer, not clicked in a
   live KiCad.
-- Not packaged for the KiCad Plugin and Content Manager; install by copying the folder.
+- The PCM zip has been built and passes `kipy.packaging validate`, but **has not been installed through
+  KiCad's PCM yet**. Unverified: that the PCM creates the plugin's Python environment from
+  `requirements.txt` the same way as a manual install, and the exact icon sizes PCM shows. It is not in
+  KiCad's official repository (submission needs the maintainers' review; the docs also ask packages that
+  link to commercial services such as component lookup to contact plugins@kicad.org first).
 
 ## Licensing – please read
 

@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .venv/
 jlc-footprint-importer.log
+dist/
