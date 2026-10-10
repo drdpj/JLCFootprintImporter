@@ -154,9 +154,9 @@ copied from a working third-party repository (Bouni's), as the KiCad developer d
 - The dialog buttons for the stock choice have been run only through the importer, not clicked in a
   live KiCad.
 - Installing through KiCad's PCM from this repository has been verified on KiCad 10.0.6 / Windows:
-  the package installs, KiCad creates the plugin's Python environment, and the action runs. Releases
-  are built and published by the workflow. Still unverified: the `resources.zip` layout and the icon
-  sizes PCM shows. The plugin is not in KiCad's official repository.
+  the package installs, its icon shows in the package manager, KiCad creates the plugin's Python
+  environment, and the action runs. Releases are built and published by the workflow. The plugin is
+  not in KiCad's official repository.
 
 ## Licensing – please read
 
