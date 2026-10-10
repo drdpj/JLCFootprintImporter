@@ -1,3 +1,4 @@
+# (C) Daniel Jameson 2026
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Interface for a future "use a stock KiCad footprint if one fits" check.
 

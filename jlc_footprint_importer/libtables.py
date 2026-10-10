@@ -1,3 +1,4 @@
+# (C) Daniel Jameson 2026
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Safely register libraries in KiCad's fp-lib-table / sym-lib-table."""
 

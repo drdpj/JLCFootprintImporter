@@ -1,3 +1,4 @@
+# (C) Daniel Jameson 2026
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Provenance properties (LCSC ID, source, import date) for imported parts."""
 

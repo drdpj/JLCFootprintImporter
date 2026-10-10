@@ -1,3 +1,4 @@
+# (C) Daniel Jameson 2026
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Everything that talks to KiCad through kicad-python (the IPC API client)."""
 

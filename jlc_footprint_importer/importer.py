@@ -1,3 +1,4 @@
+# (C) Daniel Jameson 2026
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Orchestrates one import: cache check -> easyeda2kicad -> provenance -> table registration."""
 

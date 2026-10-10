@@ -1,3 +1,4 @@
+# (C) Daniel Jameson 2026
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Shared fixtures: sample library files and a fake easyeda2kicad backend (no network)."""
 

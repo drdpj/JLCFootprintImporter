@@ -1,3 +1,4 @@
+# (C) Daniel Jameson 2026
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Small wxPython dialog: ask for an LCSC ID and run the import off the UI thread.
 

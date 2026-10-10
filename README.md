@@ -106,7 +106,7 @@ Layout: `dialog.py` (wxPython UI), `importer.py` (orchestration), `libtables.py`
 
 ## Licensing – please read
 
-This plugin is licensed **GPL-3.0-or-later** (see `LICENSE`). It depends on
+Copyright (C) Daniel Jameson 2026. This plugin is licensed **GPL-3.0-or-later** (see `LICENSE`). It depends on
 [easyeda2kicad](https://github.com/uPesy/easyeda2kicad.py) (AGPL-3.0), installed separately via pip.
 
 **The footprints, symbols and 3D models downloaded from EasyEDA/LCSC have no clear open licence.**
