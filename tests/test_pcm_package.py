@@ -68,3 +68,35 @@ def test_kipy_validator_accepts_archive(archive: Path) -> None:
     report = validate.validate(archive)
     errors = [m for m in report.messages if m.level == "error"]
     assert errors == []
+
+
+def _publish(tmp_path: Path, version: str, base: str = "https://example.com/repo") -> Path:
+    meta = build_pcm.load_metadata()
+    meta["versions"][0]["version"] = version
+    archive = build_pcm.build_archive(tmp_path / f"{version}.zip")
+    package = build_pcm.repository_metadata(archive, f"https://example.com/{version}.zip", meta)
+    build_pcm.write_repository(tmp_path / "repo", package, base, "Someone")
+    return tmp_path / "repo"
+
+
+def test_repository_files_are_consistent(tmp_path: Path) -> None:
+    import hashlib
+
+    repo = _publish(tmp_path, "1.0.0")
+    repository = json.loads((repo / "repository.json").read_text(encoding="utf-8"))
+    assert repository["packages"]["url"] == "https://example.com/repo/packages.json"
+    assert repository["packages"]["sha256"] == hashlib.sha256((repo / "packages.json").read_bytes()).hexdigest()
+    assert repository["resources"]["sha256"] == hashlib.sha256((repo / "resources.zip").read_bytes()).hexdigest()
+    packages = json.loads((repo / "packages.json").read_text(encoding="utf-8"))["packages"]
+    assert [p["identifier"] for p in packages] == [build_pcm.load_metadata()["identifier"]]
+    assert packages[0]["versions"][0]["download_url"] == "https://example.com/1.0.0.zip"
+    with zipfile.ZipFile(repo / "resources.zip") as z:
+        assert z.namelist() == [f"{packages[0]['identifier']}/icon.png"]
+
+
+def test_new_release_keeps_previous_versions_and_replaces_same_version(tmp_path: Path) -> None:
+    _publish(tmp_path, "1.0.0")
+    _publish(tmp_path, "1.1.0")
+    repo = _publish(tmp_path, "1.1.0")
+    versions = json.loads((repo / "packages.json").read_text(encoding="utf-8"))["packages"][0]["versions"]
+    assert [v["version"] for v in versions] == ["1.1.0", "1.0.0"]

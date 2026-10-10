@@ -34,12 +34,19 @@ It uses KiCad's IPC API plugin system (not the removed SWIG `pcbnew` Action Plug
 
 ## Installation (KiCad 10.0.x)
 
-### Option A: Plugin and Content Manager (from a zip)
+### Option A: Plugin and Content Manager (recommended)
 
-Download `com.github.drdpj.jlc-footprint-importer-<version>.zip` from the
-[Releases](https://github.com/drdpj/JLCFootprintImporter/releases) page, then in KiCad open
-*Plugin and Content Manager → Install from File…* and pick the zip. (Not yet in KiCad's official
-repository; see *Packaging* below.)
+This is a self-hosted PCM repository, not KiCad's official one. Once, in KiCad open
+*Plugin and Content Manager → Manage Repositories…*, add
+
+```
+https://raw.githubusercontent.com/drdpj/JLCFootprintImporter/pcm-repository/repository.json
+```
+
+then pick that repository in the dropdown, select **JLC Footprint Importer**, *Install*, and
+*Apply Pending Changes*. Updates appear the same way. Alternatively download the zip from
+[Releases](https://github.com/drdpj/JLCFootprintImporter/releases) and use *Install from File…*.
+(The repository branch only exists after the first tagged release; see *Packaging*.)
 
 ### Option B: manual copy
 
@@ -96,8 +103,12 @@ Layout: `dialog.py` (wxPython UI), `importer.py` (orchestration), `libtables.py`
 `python tools/build_pcm.py` builds `dist/<identifier>-<version>.zip` (reproducible; layout per the KiCad
 addon docs: `metadata.json`, `resources/icon.png`, `plugins/…`, with `"runtime": "ipc"`) and
 `dist/metadata-repository.json` (the same metadata plus `download_sha256/size/url`, which belong only in a
-repository submission). The version lives in `packaging/metadata.json`. Pushing a tag `vX.Y.Z` that matches
-it runs `.github/workflows/release.yml`: tests, build, validate, then a GitHub release with both files.
+repository entry). The version lives in `packaging/metadata.json`. Pushing a tag `vX.Y.Z` that matches
+it runs `.github/workflows/release.yml`: tests, build, validate, a GitHub release with the zip, and
+finally an update of the `pcm-repository` branch (`repository.json`, `packages.json` with all released
+versions, `resources.zip`) that KiCad's PCM reads. To release: bump the version in
+`packaging/metadata.json`, commit, `git tag vX.Y.Z`, `git push --tags`. The repository file formats are
+copied from a working third-party repository (Bouni's), as the KiCad developer docs don't describe them.
 
 ## Limitations / known gaps
 
@@ -138,11 +149,10 @@ it runs `.github/workflows/release.yml`: tests, build, validate, then a GitHub r
   (e.g. a polarised or non-standard part) is your call – that's why you are asked.
 - The dialog buttons for the stock choice have been run only through the importer, not clicked in a
   live KiCad.
-- The PCM zip has been built and passes `kipy.packaging validate`, but **has not been installed through
-  KiCad's PCM yet**. Unverified: that the PCM creates the plugin's Python environment from
-  `requirements.txt` the same way as a manual install, and the exact icon sizes PCM shows. It is not in
-  KiCad's official repository (submission needs the maintainers' review; the docs also ask packages that
-  link to commercial services such as component lookup to contact plugins@kicad.org first).
+- The PCM zip and the self-hosted repository files are generated and schema-checked, but **nothing has
+  been installed through KiCad's PCM yet** and the release workflow has not run. Unverified: that PCM
+  creates the plugin's Python environment from `requirements.txt` like a manual install, the
+  `resources.zip` layout, and the icon sizes PCM shows. The plugin is not in KiCad's official repository.
 
 ## Licensing – please read
 
