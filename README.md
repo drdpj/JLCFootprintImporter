@@ -153,10 +153,10 @@ copied from a working third-party repository (Bouni's), as the KiCad developer d
   (e.g. a polarised or non-standard part) is your call – that's why you are asked.
 - The dialog buttons for the stock choice have been run only through the importer, not clicked in a
   live KiCad.
-- The PCM zip and the self-hosted repository files are generated and schema-checked, but **nothing has
-  been installed through KiCad's PCM yet** and the release workflow has not run. Unverified: that PCM
-  creates the plugin's Python environment from `requirements.txt` like a manual install, the
-  `resources.zip` layout, and the icon sizes PCM shows. The plugin is not in KiCad's official repository.
+- Installing through KiCad's PCM from this repository has been verified on KiCad 10.0.6 / Windows:
+  the package installs, KiCad creates the plugin's Python environment, and the action runs. Releases
+  are built and published by the workflow. Still unverified: the `resources.zip` layout and the icon
+  sizes PCM shows. The plugin is not in KiCad's official repository.
 
 ## Licensing – please read
 
