@@ -2,7 +2,7 @@
   "$schema": "https://go.kicad.org/pcm/schemas/v2",
   "name": "JLC Footprint Importer",
   "description": "Import LCSC/JLCPCB parts (symbol, footprint, 3D model) into a project-local library.",
-  "description_full": "Adds an Import LCSC part action to the PCB editor. Enter an LCSC part number (e.g. C1002) and the symbol, footprint and 3D model are fetched with easyeda2kicad into a project-local 'jlc' library, which is registered in the project's library tables. Offers KiCad's stock chip footprints (R/C/L/LED/D) first where one fits, skips parts already imported, refuses same-named footprints whose pads differ, and records the LCSC ID, source and import date on every imported part. Needs internet access. Note: EasyEDA/LCSC-sourced footprints have no clear open licence, so prefer KiCad's stock footprints where one exists. Requires the KiCad IPC API to be enabled; the plugin creates its own Python environment on first use.",
+  "description_full": "Adds an Import LCSC part action to the PCB and schematic editors. Enter an LCSC part number (e.g. C1002) and the symbol, footprint and 3D model are fetched with easyeda2kicad into a project-local 'jlc' library, which is registered in the project's library tables. Offers KiCad's stock chip footprints (R/C/L/LED/D) first where one fits, skips parts already imported, refuses same-named footprints whose pads differ, and records the LCSC ID, source and import date on every imported part. Needs internet access. Note: EasyEDA/LCSC-sourced footprints have no clear open licence, so prefer KiCad's stock footprints where one exists. Requires the KiCad IPC API to be enabled; the plugin creates its own Python environment on first use.",
   "identifier": "com.github.drdpj.jlc-footprint-importer",
   "type": "plugin",
   "author": {
@@ -18,7 +18,7 @@
   "tags": ["jlcpcb", "lcsc", "easyeda", "importer", "footprint"],
   "versions": [
     {
-      "version": "1.0.4",
+      "version": "1.0.5",
       "status": "stable",
       "kicad_version": "10.0",
       "runtime": "ipc"
