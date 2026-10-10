@@ -9,14 +9,14 @@
   },
   "packages": {
     "url": "https://raw.githubusercontent.com/drdpj/JLCFootprintImporter/pcm-repository/packages.json",
-    "sha256": "78cb122a0182b313dce91c944e2225035f429eda872302002ad11a78ace39c05",
-    "update_time_utc": "2026-10-10 16:26:24",
-    "update_timestamp": 1791649584
+    "sha256": "83cc4fd8db6519f3ee28ed7b3883dff5d68175eebe0c24ad00e9c18443056b22",
+    "update_time_utc": "2026-10-10 16:37:18",
+    "update_timestamp": 1791650238
   },
   "resources": {
     "url": "https://raw.githubusercontent.com/drdpj/JLCFootprintImporter/pcm-repository/resources.zip",
     "sha256": "fd08be8dec4b0970180137e493e47f8708cd341b35d1daeca389d6fb0c1c56ba",
-    "update_time_utc": "2026-10-10 16:26:24",
-    "update_timestamp": 1791649584
+    "update_time_utc": "2026-10-10 16:37:18",
+    "update_timestamp": 1791650238
   }
 }

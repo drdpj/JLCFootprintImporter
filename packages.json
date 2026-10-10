@@ -26,6 +26,16 @@
       ],
       "versions": [
         {
+          "version": "1.0.2",
+          "status": "testing",
+          "kicad_version": "10.0",
+          "runtime": "ipc",
+          "download_sha256": "054340f297c3a63bec2699e9e8d5df136143e8f507fcfaec70d46a5b184c6c8d",
+          "download_size": 45127,
+          "download_url": "https://github.com/drdpj/JLCFootprintImporter/releases/download/v1.0.2/com.github.drdpj.jlc-footprint-importer-1.0.2.zip",
+          "install_size": 111457
+        },
+        {
           "version": "1.0.1",
           "status": "testing",
           "kicad_version": "10.0",
