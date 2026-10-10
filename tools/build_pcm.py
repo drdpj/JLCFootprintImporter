@@ -16,7 +16,8 @@ With --repo-dir it also (re)generates a self-hosted PCM repository there: reposi
 packages.json (merging versions already listed in the directory) and resources.zip. Users add
 the raw URL of repository.json under PCM > Manage Repositories. The file formats follow the
 working repository https://github.com/Bouni/bouni-kicad-repository; they are not in the KiCad
-developer docs. TODO: the resources.zip layout (<identifier>/icon.png) is unverified.
+developer docs. TODO: the resources.zip layout (<identifier>/icon.png) is unverified; to confirm,
+check that the icon shows in KiCad's package list for a package that is not yet installed.
 
 Usage: python tools/build_pcm.py [--url DOWNLOAD_URL] [--repo-dir DIR]
 """
