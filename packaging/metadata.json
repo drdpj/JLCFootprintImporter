@@ -6,7 +6,7 @@
   "identifier": "com.github.drdpj.jlc-footprint-importer",
   "type": "plugin",
   "author": {
-    "name": "Daniel Jameson",
+    "name": "drdpj",
     "contact": {
       "web": "https://github.com/drdpj"
     }
@@ -18,8 +18,8 @@
   "tags": ["jlcpcb", "lcsc", "easyeda", "importer", "footprint"],
   "versions": [
     {
-      "version": "1.0.3",
-      "status": "testing",
+      "version": "1.0.4",
+      "status": "stable",
       "kicad_version": "10.0",
       "runtime": "ipc"
     }
