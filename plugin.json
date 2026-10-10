@@ -1,0 +1,22 @@
+{
+  "$schema": "https://go.kicad.org/api/schemas/v1",
+  "identifier": "com.github.danielj.jlc-footprint-importer",
+  "name": "JLC Footprint Importer",
+  "description": "Import an LCSC/JLCPCB part (symbol, footprint, 3D model) into a project-local KiCad library using easyeda2kicad.",
+  "runtime": {
+    "type": "python",
+    "min_version": "3.10"
+  },
+  "actions": [
+    {
+      "identifier": "import-lcsc-part",
+      "name": "Import LCSC part",
+      "description": "Import an LCSC/JLCPCB part into the project-local jlc library.",
+      "show-button": true,
+      "icons-light": ["icons/import-light-24.png", "icons/import-light-48.png"],
+      "icons-dark": ["icons/import-dark-24.png", "icons/import-dark-48.png"],
+      "scopes": ["pcb"],
+      "entrypoint": "main.py"
+    }
+  ]
+}

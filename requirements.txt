@@ -1,0 +1,2 @@
+kicad-python==0.8.0
+easyeda2kicad==1.0.1

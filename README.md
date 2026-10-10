@@ -1,2 +1,120 @@
-# JLCFootprintImporter
-A KiCad Plugin to import JLC Footprints
+# JLC Footprint Importer
+
+A KiCad 10 plugin that imports an LCSC/JLCPCB part (symbol, footprint, 3D model) into a
+**project-local** library, using [easyeda2kicad](https://github.com/uPesy/easyeda2kicad.py)
+for the actual EasyEDA parsing/conversion.
+
+It uses KiCad's IPC API plugin system (not the removed SWIG `pcbnew` Action Plugin API).
+
+## What it does
+
+1. Adds an **Import LCSC part** action to the PCB editor.
+2. Asks for an LCSC part number (e.g. `C1002`). If exactly one footprint is selected and it has an
+   `LCSC` (or `LCSC Part`) field, the dialog is pre-filled with it.
+3. Runs the equivalent of
+   `easyeda2kicad --full --lcsc_id=<ID> --output <project>/jlc-libs/jlc`
+   (called as a library; falls back to the CLI/subprocess if the package can't be imported).
+4. Creates, inside the project folder:
+   - `jlc-libs/jlc.pretty/` – footprints
+   - `jlc-libs/jlc.kicad_sym` – symbols
+   - `jlc-libs/jlc.3dshapes/` – 3D models (referenced as `${KIPRJMOD}/jlc-libs/jlc.3dshapes/...`)
+5. Registers `jlc` in the project's `fp-lib-table` and `sym-lib-table` (existing entries are left
+   byte-for-byte untouched; nothing is duplicated; a `.bak` of the previous table is kept).
+6. Stamps each imported footprint and symbol with the properties `LCSC` (the ID),
+   `Source` (`easyeda2kicad / LCSC`) and `Import Date` (ISO date), and writes a descriptive
+   description/keywords from the EasyEDA data, e.g. `Ferrite Beads 600Ω ±25% 100MHz, L0603
+   package, Sunlord GZ1608D601TF [LCSC C1002, JLCPCB Basic Part]`, plus `Category`,
+   `Manufacturer`, `MPN` and `JLCPCB Part Class` properties on the footprint.
+7. If the part is already in the library, nothing is downloaded and you are told so. If a
+   *different* part would produce a footprint with the same name as one already in the library
+   (e.g. two different 0603 resistors both give `R0603`), nothing is imported and you are told
+   which existing footprint (and LCSC ID) it matches, so you can reuse it.
+8. Errors (no network, unknown ID, converter failure) are shown as plain messages in the dialog;
+   details go to `jlc-footprint-importer.log` in the project folder.
+
+## Installation (KiCad 10.0.x)
+
+1. Copy (or symlink) this folder to the KiCad user plugin directory **as its own subfolder**
+   (`plugin.json` must not sit directly in `plugins\`):
+   - Windows: `C:\Users\<you>\Documents\KiCad\10.0\plugins\jlc-footprint-importer\`
+   - macOS: `~/Documents/KiCad/10.0/plugins/jlc-footprint-importer/`
+   - Linux: `~/.local/share/KiCad/10.0/plugins/jlc-footprint-importer/`
+
+   Only `plugin.json`, `requirements.txt`, `main.py`, `icons/` and `jlc_footprint_importer/` are needed.
+   KiCad requires the `identifier` in `plugin.json` to be reverse-DNS style with at least three
+   parts (e.g. `com.github.<your-user>.jlc-footprint-importer`); change `danielj` to your own
+   GitHub username if you fork this.
+2. If your KiCad has a setting to enable the API/plugins (Preferences → Plugins), make sure it is on.
+3. Restart KiCad and open the PCB editor. KiCad creates a Python virtual environment for the plugin
+   and installs `requirements.txt` (pinned `kicad-python` and `easyeda2kicad`). This takes a while
+   and needs internet access; the toolbar button only appears once it has finished. If it never
+   appears, check KiCad's trace log (see the KiCad developer docs, *IPC API → For Add-on
+   Developers*), and use *Recreate Plugin Environment* from the action's context menu in the PCB
+   editor preferences.
+
+## Usage
+
+Open a board, click **Import LCSC part**, enter the part number, press **Import**. Then add the
+symbol/footprint from the `jlc` library as usual. **The first import into a project creates the
+`jlc` library entries, and KiCad only reads a project's library tables when the project is opened,
+so close and reopen the project once before `jlc` shows up in the chooser.**
+
+## Development
+
+```
+pip install -r requirements-dev.txt
+python -m pytest
+```
+
+Tests mock easyeda2kicad; they never touch the network. The manifest can be checked with
+`python -m kipy.packaging validate .` (from `kicad-python`).
+
+Layout: `dialog.py` (wxPython UI), `importer.py` (orchestration), `libtables.py` + `sexpr.py` (table editing),
+`provenance.py`, `partinfo.py` (descriptions/metadata), `cache.py`, `easyeda_backend.py`,
+`kicad_context.py` (IPC API), `config.py` (paths/logging), `stock_check.py` (stub, see below).
+
+## Limitations / known gaps
+
+- **Tested on KiCad 10.0.6 / Windows only.** Verified in a running KiCad: the plugin loads, the
+  toolbar action runs, the dialog opens, imports work, and the `jlc` footprint library appears
+  with the imported part. Not yet verified: pre-filling from a selected footprint's `LCSC` field,
+  macOS/Linux, and the symbol chooser after a reopen. Remaining `TODO` comments in the code mark
+  what the docs don't specify (e.g. the working directory KiCad launches the entrypoint with).
+- The dialog uses **wxPython** (`wx`), which comes from KiCad's own Python via the plugin venv
+  (`--system-site-packages`). tkinter is *not* available in KiCad's bundled Python. The KiCad docs
+  don't promise that `wx` is importable in plugin environments.
+- The IPC API (KiCad 9/10) offers no way to refresh library tables, so the project must be
+  reopened to see a newly created library.
+- KiCad's console may print wxWidgets debug lines such as `TreeView_SortChildrenCB() failed` or
+  `SetFocus failed`; these come from KiCad's own UI and are harmless.
+- easyeda2kicad names footprints by package (e.g. `R0603`) and symbols by part number. A part whose
+  footprint name already exists in the library is **not imported** (reported as a duplicate, nothing
+  is overwritten) – so the existing footprint is reused. If the part details can't be fetched
+  (network), this pre-check is skipped and easyeda2kicad's own "already exists" error applies.
+- The footprint-name check compares names only, not geometry: two same-named but different
+  footprints (e.g. different 3D models or pad sizes) are treated as the same.
+- Footprints are emitted by easyeda2kicad in its own (older-style) format; KiCad reads and
+  upgrades them. Quality of EasyEDA-derived footprints and 3D models varies – always check them
+  (for example, the reference text can be large and overlap the pads).
+- Only the PCB editor is supported by KiCad 10 for IPC plugins. One part per import.
+- The part description is built from EasyEDA's data (category tag, value, package, manufacturer).
+  It is only as good as that data.
+- The toolbar icons are simple generated placeholders.
+- Not implemented yet: the **stock footprint check** (offer e.g. `Resistor_SMD:R_0603_1608Metric`
+  instead of importing). The interface is in `jlc_footprint_importer/stock_check.py`.
+- Not packaged for the KiCad Plugin and Content Manager; install by copying the folder.
+
+## Licensing – please read
+
+This plugin is licensed **GPL-3.0-or-later** (see `LICENSE`). It depends on
+[easyeda2kicad](https://github.com/uPesy/easyeda2kicad.py) (AGPL-3.0), installed separately via pip.
+
+**The footprints, symbols and 3D models downloaded from EasyEDA/LCSC have no clear open licence.**
+They are user-contributed or manufacturer-supplied data, and their redistribution terms are
+unclear. Therefore:
+
+- **Prefer KiCad's stock footprints** whenever one exists for the package, e.g.
+  `Resistor_SMD:R_0603_1608Metric`.
+- Keep imports in this **separate** library (`jlc`), do not merge them into other libraries, and
+  think twice before publishing `jlc-libs/` in an open-source project. The provenance properties
+  are there so imported parts stay identifiable.
