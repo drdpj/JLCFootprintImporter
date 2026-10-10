@@ -13,7 +13,7 @@
           "web": "https://github.com/drdpj"
         }
       },
-      "license": "GPL-3.0-or-later",
+      "license": "GPL-3.0",
       "resources": {
         "homepage": "https://github.com/drdpj/JLCFootprintImporter"
       },
@@ -25,6 +25,16 @@
         "footprint"
       ],
       "versions": [
+        {
+          "version": "1.0.1",
+          "status": "testing",
+          "kicad_version": "10.0",
+          "runtime": "ipc",
+          "download_sha256": "6fc96d94f70ca2c305630064e30f57eade2b579f57fdee8be5cedc7c1a970288",
+          "download_size": 44739,
+          "download_url": "https://github.com/drdpj/JLCFootprintImporter/releases/download/v1.0.1/com.github.drdpj.jlc-footprint-importer-1.0.1.zip",
+          "install_size": 110343
+        },
         {
           "version": "1.0.0",
           "status": "testing",
