@@ -140,8 +140,9 @@ copied from a working third-party repository (Bouni's), as the KiCad developer d
   (for example, the reference text can be large and overlap the pads).
 - The action is declared for both the PCB and schematic editors (`scopes` in `plugin.json`). From the
   schematic editor there is no pre-fill from a selected symbol, and the project is found from the open
-  schematic. **Not yet verified in a live KiCad**; the docs don't say which editor launched the action,
-  so if a PCB is open it is used to find the project. One part per import.
+  schematic. Launching from the schematic editor has been checked in KiCad 10.0.6 on Windows; the
+  docs don't say which editor launched the action, so if a PCB is open it is used to find the project.
+  One part per import.
 - The part description is built from EasyEDA's data (category tag, value, package, manufacturer).
   It is only as good as that data.
 - The toolbar icons are simple generated placeholders.
