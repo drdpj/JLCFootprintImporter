@@ -125,7 +125,7 @@ def write_repository(repo_dir: Path, package: dict, base_url: str, owner_name: s
     repository = {
         "$schema": "https://gitlab.com/kicad/code/kicad/-/raw/master/kicad/pcm/schemas/pcm.v1.schema.json#/definitions/Repository",
         "name": f"{owner_name}'s KiCad repository",
-        "maintainer": package.get("maintainer", package["author"]),
+        "maintainer": {"name": owner_name, "contact": package.get("maintainer", package["author"]).get("contact", {})},
         "packages": {
             "url": f"{base_url}/packages.json",
             "sha256": hashlib.sha256(packages_path.read_bytes()).hexdigest(),
