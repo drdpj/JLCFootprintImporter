@@ -79,6 +79,10 @@ def extract_pads(footprint_text: str) -> list[Pad]:
     return [_pad_from_node(n) for n in parse(footprint_text).find_all("pad")]
 
 
+def _unnumbered(pads: list[Pad]) -> Counter:
+    return Counter(p._replace(number="") for p in pads)
+
+
 def compare_footprints(existing_text: str, new_text: str) -> list[str]:
     """Human-readable pad differences; an empty list means the pad geometry is identical."""
     existing, new = extract_pads(existing_text), extract_pads(new_text)
@@ -87,6 +91,8 @@ def compare_footprints(existing_text: str, new_text: str) -> list[str]:
         differences.append(f"pad count differs ({len(existing)} in the library, {len(new)} in the new part)")
     only_existing = Counter(existing) - Counter(new)
     only_new = Counter(new) - Counter(existing)
+    if (only_existing or only_new) and _unnumbered(existing) == _unnumbered(new):
+        differences.append("pad geometry is the same but the pad numbering differs (pin numbers would not match the symbol)")
     for pad in sorted(only_existing)[:_MAX_REPORTED]:
         differences.append(f"library has {pad.describe()}")
     for pad in sorted(only_new)[:_MAX_REPORTED]:

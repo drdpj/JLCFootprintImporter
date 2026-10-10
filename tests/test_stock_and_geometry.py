@@ -71,6 +71,12 @@ def test_different_pad_count_is_reported() -> None:
     assert diffs[0] == "pad count differs (2 in the library, 3 in the new part)"
 
 
+def test_renumbered_pads_are_flagged_as_numbering_difference() -> None:
+    swapped = TWO_PADS.replace("pad 1", "pad X").replace("pad 2", "pad 1").replace("pad X", "pad 2")
+    diffs = compare_footprints(footprint_text(), footprint_text(pads=swapped))
+    assert "numbering differs" in diffs[0]
+
+
 def test_quoted_pad_numbers_and_drills_are_understood() -> None:
     thru = '\t(pad "1" thru_hole circle (at 0 0) (size 1.6 1.6) (drill 0.8) (layers *.Cu *.Mask))\n'
     assert compare_footprints(footprint_text(pads=thru), footprint_text(pads=thru)) == []
