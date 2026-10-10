@@ -1,6 +1,6 @@
 {
   "$schema": "https://gitlab.com/kicad/code/kicad/-/raw/master/kicad/pcm/schemas/pcm.v1.schema.json#/definitions/Repository",
-  "name": "Daniel Jameson's KiCad repository",
+  "name": "drdpj's KiCad repository",
   "maintainer": {
     "name": "Daniel Jameson",
     "contact": {
