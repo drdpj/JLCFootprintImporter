@@ -8,7 +8,7 @@ It uses KiCad's IPC API plugin system (not the removed SWIG `pcbnew` Action Plug
 
 ## What it does
 
-1. Adds an **Import LCSC part** action to the PCB editor.
+1. Adds an **Import LCSC part** action to the PCB editor and the schematic editor.
 2. Asks for an LCSC part number (e.g. `C1002`). If exactly one footprint is selected and it has an
    `LCSC` (or `LCSC Part`) field, the dialog is pre-filled with it.
 3. Runs the equivalent of
@@ -138,7 +138,10 @@ copied from a working third-party repository (Bouni's), as the KiCad developer d
 - Footprints are emitted by easyeda2kicad in its own (older-style) format; KiCad reads and
   upgrades them. Quality of EasyEDA-derived footprints and 3D models varies – always check them
   (for example, the reference text can be large and overlap the pads).
-- Only the PCB editor is supported by KiCad 10 for IPC plugins. One part per import.
+- The action is declared for both the PCB and schematic editors (`scopes` in `plugin.json`). From the
+  schematic editor there is no pre-fill from a selected symbol, and the project is found from the open
+  schematic. **Not yet verified in a live KiCad**; the docs don't say which editor launched the action,
+  so if a PCB is open it is used to find the project. One part per import.
 - The part description is built from EasyEDA's data (category tag, value, package, manufacturer).
   It is only as good as that data.
 - The toolbar icons are simple generated placeholders.

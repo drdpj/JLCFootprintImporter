@@ -48,17 +48,30 @@ def _selected_footprint_fields(board) -> dict[str, str]:
 
 
 def connect() -> KiCadContext:
-    """Connect to the running KiCad (uses KICAD_API_SOCKET/KICAD_API_TOKEN set by KiCad)."""
+    """Connect to the running KiCad (uses KICAD_API_SOCKET/KICAD_API_TOKEN set by KiCad).
+
+    Works from the PCB editor or the schematic editor. TODO: the docs don't say which editor
+    launched the action, so a PCB is preferred when one is open (the project is the same in
+    the normal case). Pre-filling from a selection is only done for PCB footprints; reading a
+    selected schematic symbol's fields is not implemented (unverified).
+    """
     from kipy import KiCad
+    from kipy.proto.common.types import DocumentType
 
     kicad = KiCad()
-    board = kicad.get_board()
-    # Project.path is documented in kipy's protobuf as "The path to the project directory".
-    project_dir = Path(board.get_project().path)
+    pcb_docs = kicad.get_open_documents(DocumentType.DOCTYPE_PCB)
+    if pcb_docs:
+        board = kicad.get_board()
+        # Project.path is documented in kipy's protobuf as "The path to the project directory".
+        project_dir = Path(board.get_project().path)
+        prefill = ""
+        try:
+            prefill = lcsc_id_from_fields(_selected_footprint_fields(board))
+        except Exception:  # pre-fill is best-effort
+            log.exception("Could not read LCSC field from selection")
+        return KiCadContext(project_dir=project_dir, prefill_lcsc_id=prefill)
 
-    prefill = ""
-    try:
-        prefill = lcsc_id_from_fields(_selected_footprint_fields(board))
-    except Exception:  # pre-fill is best-effort
-        log.exception("Could not read LCSC field from selection")
-    return KiCadContext(project_dir=project_dir, prefill_lcsc_id=prefill)
+    schematic_docs = kicad.get_open_documents(DocumentType.DOCTYPE_SCHEMATIC)
+    if not schematic_docs:
+        raise RuntimeError("no PCB or schematic is open")
+    return KiCadContext(project_dir=Path(kicad.get_project(schematic_docs[0]).path))
