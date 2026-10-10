@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://go.kicad.org/pcm/schemas/v2",
   "name": "JLC Footprint Importer",
   "description": "Import LCSC/JLCPCB parts (symbol, footprint, 3D model) into a project-local library.",
