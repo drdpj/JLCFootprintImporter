@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "https://go.kicad.org/pcm/schemas/v2",
   "name": "JLC Footprint Importer",
   "description": "Import LCSC/JLCPCB parts (symbol, footprint, 3D model) into a project-local library.",
@@ -11,14 +11,14 @@
       "web": "https://github.com/drdpj"
     }
   },
-  "license": "GPL-3.0-or-later",
+  "license": "GPL-3.0",
   "resources": {
     "homepage": "https://github.com/drdpj/JLCFootprintImporter"
   },
   "tags": ["jlcpcb", "lcsc", "easyeda", "importer", "footprint"],
   "versions": [
     {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "status": "testing",
       "kicad_version": "10.0",
       "runtime": "ipc"

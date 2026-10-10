@@ -100,3 +100,15 @@ def test_new_release_keeps_previous_versions_and_replaces_same_version(tmp_path:
     repo = _publish(tmp_path, "1.1.0")
     versions = json.loads((repo / "packages.json").read_text(encoding="utf-8"))["packages"][0]["versions"]
     assert [v["version"] for v in versions] == ["1.1.0", "1.0.0"]
+
+
+def test_packages_json_validates_against_pcm_v1_schema(tmp_path: Path) -> None:
+    # KiCad parses a repository's packages.json with the v1 schema (e.g. its fixed licence list).
+    jsonschema = pytest.importorskip("jsonschema")
+    from importlib.resources import files
+
+    schema = json.loads(files("kipy.packaging.schemas").joinpath("pcm.v1.schema.json").read_text(encoding="utf-8"))
+    repo = _publish(tmp_path, "1.0.0")
+    package = json.loads((repo / "packages.json").read_text(encoding="utf-8"))["packages"][0]
+    errors = [e.message for e in jsonschema.Draft7Validator(schema).iter_errors(package)]
+    assert errors == []
