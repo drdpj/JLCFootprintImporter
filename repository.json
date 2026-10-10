@@ -1,0 +1,22 @@
+{
+  "$schema": "https://gitlab.com/kicad/code/kicad/-/raw/master/kicad/pcm/schemas/pcm.v1.schema.json#/definitions/Repository",
+  "name": "Daniel Jameson's KiCad repository",
+  "maintainer": {
+    "name": "Daniel Jameson",
+    "contact": {
+      "web": "https://github.com/drdpj"
+    }
+  },
+  "packages": {
+    "url": "https://raw.githubusercontent.com/drdpj/JLCFootprintImporter/pcm-repository/packages.json",
+    "sha256": "13b0de6b73fba87a81b97383b42c534a9ebc2162e367570682aba45386d5deba",
+    "update_time_utc": "2026-10-10 16:19:52",
+    "update_timestamp": 1791649192
+  },
+  "resources": {
+    "url": "https://raw.githubusercontent.com/drdpj/JLCFootprintImporter/pcm-repository/resources.zip",
+    "sha256": "fd08be8dec4b0970180137e493e47f8708cd341b35d1daeca389d6fb0c1c56ba",
+    "update_time_utc": "2026-10-10 16:19:52",
+    "update_timestamp": 1791649192
+  }
+}
