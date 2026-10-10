@@ -13,6 +13,28 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
+def _report_startup_failure(exc: Exception) -> None:
+    """No project folder is known yet, so log to the temp folder and tell the user."""
+    import tempfile
+    import traceback
+
+    log_path = Path(tempfile.gettempdir()) / "jlc-footprint-importer-startup.log"
+    message = f"Could not connect to KiCad: {exc}"
+    try:
+        log_path.write_text(traceback.format_exc(), encoding="utf-8")
+        message += f"\n\nDetails: {log_path}"
+    except OSError:
+        pass
+    print(f"JLC Footprint Importer: {message}", file=sys.stderr)
+    try:
+        import wx
+
+        app = wx.App(False)  # noqa: F841 - must exist for the message box
+        wx.MessageBox(message, "JLC Footprint Importer", wx.OK | wx.ICON_ERROR)
+    except Exception:
+        pass
+
+
 def main() -> int:
     from jlc_footprint_importer.config import setup_logging
     from jlc_footprint_importer.kicad_context import connect
@@ -20,7 +42,7 @@ def main() -> int:
     try:
         context = connect()
     except Exception as exc:  # KiCad not reachable, no board open, ...
-        print(f"JLC Footprint Importer: could not connect to KiCad: {exc}", file=sys.stderr)
+        _report_startup_failure(exc)
         return 1
 
     setup_logging(context.project_dir)

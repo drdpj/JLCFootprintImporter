@@ -47,31 +47,42 @@ def _selected_footprint_fields(board) -> dict[str, str]:
     }
 
 
+def _open_documents(kicad, doc_type) -> tuple[list, str]:
+    """Return (documents, error). Each editor may reject queries about the other's documents."""
+    try:
+        return list(kicad.get_open_documents(doc_type)), ""
+    except Exception as exc:
+        log.exception("get_open_documents(%s) failed", doc_type)
+        return [], f"{doc_type}: {exc}"
+
+
 def connect() -> KiCadContext:
     """Connect to the running KiCad (uses KICAD_API_SOCKET/KICAD_API_TOKEN set by KiCad).
 
     Works from the PCB editor or the schematic editor. TODO: the docs don't say which editor
-    launched the action, so a PCB is preferred when one is open (the project is the same in
-    the normal case). Pre-filling from a selection is only done for PCB footprints; reading a
-    selected schematic symbol's fields is not implemented (unverified).
+    launched the action or what GetOpenDocuments returns for the other editor's type, so every
+    document type is tried and failures are collected into the error. Pre-fill from a selection
+    is only done for PCB footprints (reading a selected schematic symbol's fields is unverified).
     """
     from kipy import KiCad
     from kipy.proto.common.types import DocumentType
 
     kicad = KiCad()
-    pcb_docs = kicad.get_open_documents(DocumentType.DOCTYPE_PCB)
-    if pcb_docs:
-        board = kicad.get_board()
-        # Project.path is documented in kipy's protobuf as "The path to the project directory".
-        project_dir = Path(board.get_project().path)
+    errors: list[str] = []
+    for doc_type in (DocumentType.DOCTYPE_PCB, DocumentType.DOCTYPE_SCHEMATIC):
+        docs, error = _open_documents(kicad, doc_type)
+        if error:
+            errors.append(error)
+        if not docs:
+            continue
+        project_dir = Path(kicad.get_project(docs[0]).path)
         prefill = ""
-        try:
-            prefill = lcsc_id_from_fields(_selected_footprint_fields(board))
-        except Exception:  # pre-fill is best-effort
-            log.exception("Could not read LCSC field from selection")
+        if doc_type == DocumentType.DOCTYPE_PCB:
+            try:
+                prefill = lcsc_id_from_fields(_selected_footprint_fields(kicad.get_board()))
+            except Exception:  # pre-fill is best-effort
+                log.exception("Could not read LCSC field from selection")
         return KiCadContext(project_dir=project_dir, prefill_lcsc_id=prefill)
 
-    schematic_docs = kicad.get_open_documents(DocumentType.DOCTYPE_SCHEMATIC)
-    if not schematic_docs:
-        raise RuntimeError("no PCB or schematic is open")
-    return KiCadContext(project_dir=Path(kicad.get_project(schematic_docs[0]).path))
+    detail = "; ".join(errors) or "KiCad reported no open documents"
+    raise RuntimeError(f"no PCB or schematic is open ({detail})")
