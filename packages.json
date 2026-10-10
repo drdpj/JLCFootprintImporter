@@ -8,7 +8,7 @@
       "identifier": "com.github.drdpj.jlc-footprint-importer",
       "type": "plugin",
       "author": {
-        "name": "Daniel Jameson",
+        "name": "drdpj",
         "contact": {
           "web": "https://github.com/drdpj"
         }
@@ -25,6 +25,16 @@
         "footprint"
       ],
       "versions": [
+        {
+          "version": "1.0.4",
+          "status": "stable",
+          "kicad_version": "10.0",
+          "runtime": "ipc",
+          "download_sha256": "9a011cdbdaee0c057cdfc248514577ee00f3365a86db724b0373e33ad1d4b5d3",
+          "download_size": 45564,
+          "download_url": "https://github.com/drdpj/JLCFootprintImporter/releases/download/v1.0.4/com.github.drdpj.jlc-footprint-importer-1.0.4.zip",
+          "install_size": 112527
+        },
         {
           "version": "1.0.3",
           "status": "testing",
