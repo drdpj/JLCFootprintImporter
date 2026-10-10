@@ -2,7 +2,7 @@
   "$schema": "https://gitlab.com/kicad/code/kicad/-/raw/master/kicad/pcm/schemas/pcm.v1.schema.json#/definitions/Repository",
   "name": "drdpj's KiCad repository",
   "maintainer": {
-    "name": "Daniel Jameson",
+    "name": "drdpj",
     "contact": {
       "web": "https://github.com/drdpj"
     }
